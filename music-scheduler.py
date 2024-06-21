@@ -33,8 +33,16 @@ def convert_mp3_to_wav(mp3_file):
 
 def play_playlist(directory):
     global playlist
+    load_playlist(directory)
+    while not stop_playback:
+        if playlist:
+            play_next_music()
+        else:
+            load_playlist(directory)
+
+def load_playlist(directory):
+    global playlist
     playlist = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.mp3')]
-    play_next_music()
 
 def play_next_music():
     global play_obj, stop_playback  
