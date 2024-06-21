@@ -1,0 +1,23 @@
+[
+    {
+        "action": "play",
+        "file": "musics/",
+        "date": {
+            "year": 2024,
+            "month": 6,
+            "day": 20,
+            "hour": 23,
+            "minute": 36
+        }
+    },
+    {
+        "action": "pause",
+        "date": {
+            "year": 2024,
+            "month": 6,
+            "day": 20,
+            "hour": 23,
+            "minute": 37
+        }
+    }
+]
