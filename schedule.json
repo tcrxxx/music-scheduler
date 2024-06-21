@@ -2,22 +2,18 @@
     {
         "action": "play",
         "file": "musics/",
-        "date": {
-            "year": 2024,
-            "month": 6,
-            "day": 21,
+        "cron": {
+            "day_of_week": "fri",
             "hour": 0,
-            "minute": 48
+            "minute": 54
         }
     },
     {
         "action": "stop",
-        "date": {
-            "year": 2024,
-            "month": 6,
-            "day": 21,
+        "cron": {
+            "day_of_week": "fri",
             "hour": 0,
-            "minute": 49
+            "minute": 59
         }
     }
 ]

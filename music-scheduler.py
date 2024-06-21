@@ -88,10 +88,10 @@ def load_schedule():
         
         if cron:
             print(f'Configure via cron {cron} action {action}')
-            if action == 'stop':
-                scheduler.add_job(stop_playlist, 'cron', **cron)
-            elif action == 'play' and file:
+            if action == 'play' and file:
                 scheduler.add_job(play_playlist, 'cron', **cron, args=[file])
+            elif action == 'stop':
+                scheduler.add_job(stop_playlist, 'cron', **cron)
             else:
                 print(f'Invalid cron task configuration: {task}')
         elif date:

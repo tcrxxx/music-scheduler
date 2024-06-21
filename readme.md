@@ -57,6 +57,27 @@ docker run -p 5000:5000 -d spotify-controller
             "minute": 0,
             "timezone": "UTC"
         }
+    },
+    {
+        "action": "play",
+        "file": "musics/",
+        "date": {
+            "year": 2024,
+            "month": 6,
+            "day": 21,
+            "hour": 0,
+            "minute": 48
+        }
+    },
+    {
+        "action": "stop",
+        "date": {
+            "year": 2024,
+            "month": 6,
+            "day": 21,
+            "hour": 0,
+            "minute": 49
+        }
     }
 ]
 
