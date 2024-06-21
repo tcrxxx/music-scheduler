@@ -7,17 +7,17 @@
             "month": 6,
             "day": 21,
             "hour": 0,
-            "minute": 24
+            "minute": 33
         }
     },
     {
-        "action": "pause",
+        "action": "stop",
         "date": {
             "year": 2024,
             "month": 6,
             "day": 21,
             "hour": 0,
-            "minute": 25
+            "minute": 34
         }
     }
 ]

@@ -59,7 +59,7 @@ def play_next_music():
         # Remover arquivo WAV temporário após reprodução
         os.remove(wav_file)
 
-def stop_music():
+def stop_playlist():
     global stop_playback
 
     if play_obj:
@@ -80,8 +80,8 @@ def load_schedule():
         
         if cron:
             print(f'Configure via cron {cron} action {action}')
-            if action == 'pause':
-                scheduler.add_job(stop_music, 'cron', **cron)
+            if action == 'stop':
+                scheduler.add_job(stop_playlist, 'cron', **cron)
             elif action == 'play' and file:
                 scheduler.add_job(play_playlist, 'cron', **cron, args=[file])
             else:
@@ -91,8 +91,8 @@ def load_schedule():
             date_time = datetime(**date)
             if action == 'play' and file:
                 scheduler.add_job(play_playlist, 'date',  args=[file], run_date=date_time) #timezone datetime(2024,6,19,1,5)
-            elif action == 'pause':
-                scheduler.add_job(stop_music, 'date', run_date=date_time) #timezone datetime(2024,6,19,1,5)
+            elif action == 'stop':
+                scheduler.add_job(stop_playlist, 'date', run_date=date_time) #timezone datetime(2024,6,19,1,5)
             else:
                 print(f'Invalid date task configuration: {task}')
         else:
