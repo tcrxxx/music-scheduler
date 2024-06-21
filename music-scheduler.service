@@ -1,0 +1,13 @@
+[Unit]
+Description=Python Audio Player Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /caminho/para/o/music-scheduler.py
+WorkingDirectory=/caminho/para/o/
+Restart=always
+User=seu_usuario
+Group=seu_grupo
+
+[Install]
+WantedBy=multi-user.target
