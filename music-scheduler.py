@@ -1,6 +1,7 @@
 import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
+import time
 from pydub import AudioSegment
 import pytz
 import simpleaudio as sa
@@ -17,6 +18,8 @@ scheduler = BackgroundScheduler(timezone=timezone(default_timezone))
 scheduler.start()
 
 playlist = []
+play_obj = None
+stop_playback = False
 
 def convert_mp3_to_wav(mp3_file):
     # Carregar arquivo MP3
@@ -34,7 +37,7 @@ def play_playlist(directory):
     play_next_music()
 
 def play_next_music():
-    global play_obj  
+    global play_obj, stop_playback  
 
     if playlist:
         file = playlist.pop(0)
@@ -48,22 +51,21 @@ def play_next_music():
         play_obj = wave_obj.play()
         play_obj.wait_done()
 
-        while play_obj.is_playing():
-            # Verificar se a reprodução deve ser pausada
-            if getattr(play_obj, 'paused', False):
-                print('Pausando...')
-                play_obj.pause()
-                return
+        while not stop_playback:
+            if not play_obj.is_playing():
+                break
+            time.sleep(0.1)
 
         # Remover arquivo WAV temporário após reprodução
         os.remove(wav_file)
 
-def pause_music():
-    global play_obj
-    
-    if play_obj and play_obj.is_playing():
-        play_obj.paused = True
-        print('Música pausada.')
+def stop_music():
+    global stop_playback
+
+    if play_obj:
+        stop_playback = True
+        play_obj.stop()
+        print('Música parada.')
 
 
 def load_schedule():
@@ -79,7 +81,7 @@ def load_schedule():
         if cron:
             print(f'Configure via cron {cron} action {action}')
             if action == 'pause':
-                scheduler.add_job(pause_music, 'cron', **cron)
+                scheduler.add_job(stop_music, 'cron', **cron)
             elif action == 'play' and file:
                 scheduler.add_job(play_playlist, 'cron', **cron, args=[file])
             else:
@@ -90,7 +92,7 @@ def load_schedule():
             if action == 'play' and file:
                 scheduler.add_job(play_playlist, 'date',  args=[file], run_date=date_time) #timezone datetime(2024,6,19,1,5)
             elif action == 'pause':
-                scheduler.add_job(pause_music, 'date', run_date=date_time) #timezone datetime(2024,6,19,1,5)
+                scheduler.add_job(stop_music, 'date', run_date=date_time) #timezone datetime(2024,6,19,1,5)
             else:
                 print(f'Invalid date task configuration: {task}')
         else:
