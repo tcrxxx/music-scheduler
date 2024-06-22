@@ -8,6 +8,7 @@ import simpleaudio as sa
 from pytz import timezone
 import os
 from tzlocal import get_localzone
+import random
 
 tz = get_localzone()
 print(f"Timezone local: {0}",tz)
@@ -42,12 +43,15 @@ def play_playlist(directory):
 
 def load_playlist(directory):
     global playlist
-    #TODO: shuffle the playlist
-    #TODO: get too endwith wav
-    playlist = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.mp3')]
+    playlist = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(('.mp3', '.wav'))]
+
+    # Set playlist to random 
+    print("Shuffle playlist order")
+    random.shuffle(playlist)
 
 def play_next_music():
-    global play_obj, stop_playback  
+    global play_obj, stop_playback
+    wasMP3Converted = False
 
     if playlist:
         file = playlist.pop(0)
