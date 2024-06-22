@@ -42,6 +42,8 @@ def play_playlist(directory):
 
 def load_playlist(directory):
     global playlist
+    #TODO: shuffle the playlist
+    #TODO: get too endwith wav
     playlist = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.mp3')]
 
 def play_next_music():
@@ -49,12 +51,13 @@ def play_next_music():
 
     if playlist:
         file = playlist.pop(0)
-        print(f'Playing {file}')
+        print(f'Check {file}')
         
-        # Converter MP3 para WAV antes de reproduzir com simpleaudio
+        #TODO: convert only if mp3
+        print(f'Converting {file}')
         wav_file = convert_mp3_to_wav(file)
         
-        # Reproduzir WAV usando simpleaudio
+        print(f'Playing {file}')
         wave_obj = sa.WaveObject.from_wave_file(wav_file)
         play_obj = wave_obj.play()
         play_obj.wait_done()
@@ -64,7 +67,9 @@ def play_next_music():
                 break
             time.sleep(0.1)
 
-        # Remover arquivo WAV temporário após reprodução
+        # Remove temporary wav file
+        #TODO: remove only converted file mp3 to wav
+        print(f'Removing {file}')
         os.remove(wav_file)
 
 def stop_playlist():
@@ -73,9 +78,10 @@ def stop_playlist():
     if play_obj:
         stop_playback = True
         play_obj.stop()
-        print('Música parada.')
+        print('Music stopped!')
 
-
+#TODO: [BUG-FIX] change print to simple log (don't show logs on journalctl)
+#TODO: remove comments
 def load_schedule():
     with open('schedule.json') as f:
         tasks = json.load(f)
