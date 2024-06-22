@@ -51,15 +51,19 @@ def load_playlist(directory):
 
 def play_next_music():
     global play_obj, stop_playback
-    wasMP3Converted = False
+    isMP3Converted = False
 
     if playlist:
         file = playlist.pop(0)
         print(f'Check {file}')
         
         #TODO: convert only if mp3
-        print(f'Converting {file}')
-        wav_file = convert_mp3_to_wav(file)
+        if(file.endswith('.mp3')):
+            print(f'Converting {file}')
+            wav_file = convert_mp3_to_wav(file)
+            isMP3Converted = True
+        else:
+            wav_file = file
         
         print(f'Playing {file}')
         wave_obj = sa.WaveObject.from_wave_file(wav_file)
@@ -72,9 +76,9 @@ def play_next_music():
             time.sleep(0.1)
 
         # Remove temporary wav file
-        #TODO: remove only converted file mp3 to wav
-        print(f'Removing {file}')
-        os.remove(wav_file)
+        if(isMP3Converted):
+            print(f'Removing {file}')
+            os.remove(wav_file)
 
 def stop_playlist():
     global stop_playback
