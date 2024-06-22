@@ -57,7 +57,6 @@ def play_next_music():
         file = playlist.pop(0)
         print(f'Check {file}')
         
-        #TODO: convert only if mp3
         if(file.endswith('.mp3')):
             print(f'Converting {file}')
             wav_file = convert_mp3_to_wav(file)
