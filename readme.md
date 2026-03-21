@@ -14,6 +14,8 @@ sudo apt-get install ffmpeg
 sudo pip install --no-cache-dir -r requirements.txt --break-system-packages
 ```
 
+* Obs.: Use --break-system-packages para instalar pacotes no sistema operacional Linux como Raspberry pi
+
 2) Rode seu music-scheduler.py (tenha atenção as configurações de cron ou date informada no schedule e a música na pasta /musics)
 
 ## Install on linux service
