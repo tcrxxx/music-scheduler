@@ -3,9 +3,8 @@ import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import time
-from pydub import AudioSegment
+from pygame import mixer
 import pytz
-import simpleaudio as sa
 from pytz import timezone
 import os
 from tzlocal import get_localzone
@@ -17,10 +16,14 @@ import logging.handlers
 logger = logging.getLogger('music-scheduler')
 logger.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter('%(name)s: %(levelname)s %(message)s')
-# SysLog
-syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-syslog_handler.setFormatter(log_formatter)
-logger.addHandler(syslog_handler)
+# SysLog (Unix only)
+if os.name == 'posix':
+    try:
+        syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
+        syslog_handler.setFormatter(log_formatter)
+        logger.addHandler(syslog_handler)
+    except Exception:
+        pass
 # FileLog
 log_file = 'music-scheduler.log'
 file_handler = logging.FileHandler(log_file)
@@ -39,19 +42,12 @@ default_timezone = 'America/Sao_Paulo'
 scheduler = BackgroundScheduler(timezone=timezone(default_timezone))
 scheduler.start()
 
+# Audio Settings
+mixer.init()
 playlist = []
-play_obj = None
 stop_playback = False
 
-def convert_mp3_to_wav(mp3_file):
-    # Load MP3 File
-    audio = AudioSegment.from_mp3(mp3_file)
-    
-    # Save temporary WAV file
-    wav_file = mp3_file.replace('.mp3', '.wav')
-    audio.export(wav_file, format='wav')
-    
-    return wav_file
+
 
 def play_playlist(directory):
     global playlist
@@ -71,42 +67,31 @@ def load_playlist(directory):
     random.shuffle(playlist)
 
 def play_next_music():
-    global play_obj, stop_playback
-    isMP3Converted = False
-
+    global stop_playback
+    
     if playlist:
         file = playlist.pop(0)
-        logger.info(f'Check {file}')
-        
-        if(file.endswith('.mp3')):
-            logger.info(f'Converting {file}')
-            wav_file = convert_mp3_to_wav(file)
-            isMP3Converted = True
-        else:
-            wav_file = file
-        
         logger.info(f'Playing {file}')
-        wave_obj = sa.WaveObject.from_wave_file(wav_file)
-        play_obj = wave_obj.play()
-        play_obj.wait_done()
-
-        while not stop_playback:
-            if not play_obj.is_playing():
-                break
-            time.sleep(0.1)
-
-        # Remove temporary wav file
-        if(isMP3Converted):
-            logger.info(f'Removing {file}')
-            os.remove(wav_file)
+        
+        try:
+            mixer.music.load(file)
+            mixer.music.play()
+            
+            # Wait for music to finish or stop signal
+            while mixer.music.get_busy() and not stop_playback:
+                time.sleep(0.1)
+                
+            if stop_playback:
+                mixer.music.stop()
+                
+        except Exception as e:
+            logger.error(f"Error playing {file}: {e}")
 
 def stop_playlist():
     global stop_playback
-
-    if play_obj:
-        stop_playback = True
-        play_obj.stop()
-        logger.info('Music stopped!')
+    stop_playback = True
+    mixer.music.stop()
+    logger.info('Music stopped!')
 
 def load_schedule():
     with open('schedule.json') as f:

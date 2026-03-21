@@ -1,6 +1,23 @@
 [
     {
         "action": "play",
+        "file": "c:/Users/Administrador/developer/repos/music-scheduler/musics/",
+        "cron": {
+            "day_of_week": "sat",
+            "hour": 14,
+            "minute": 47
+        }
+    },
+    {
+        "action": "stop",
+        "cron": {
+            "day_of_week": "sat",
+            "hour": 14,
+            "minute": 59
+        }
+    },
+    {
+        "action": "play",
         "file": "musics/",
         "cron": {
             "day_of_week": "fri",
