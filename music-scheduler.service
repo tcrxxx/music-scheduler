@@ -3,7 +3,7 @@ Description=Python Audio Player Service
 After=network.target
 
 [Service]
-ExecStart=/opt/music-scheduler/music-scheduler.py
+ExecStart=/usr/bin/python3 /opt/music-scheduler/music-scheduler.py
 WorkingDirectory=/opt/music-scheduler/
 Restart=on-failure
 RestartSec=5s

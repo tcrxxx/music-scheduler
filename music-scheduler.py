@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
