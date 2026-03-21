@@ -113,3 +113,25 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
 ]
 
 ```
+
+## Falhas possíveis
+
+- pygame.error: ALSA: Couldn't open audio device: Unknown error 524
+
+solução:
+
+```bash
+sudo vim /home/admin/.asoundrc
+```
+
+```
+pcm.!default {
+    type hw
+    card 2
+}
+
+ctl.!default {
+    type hw
+    card 2
+}
+```

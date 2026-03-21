@@ -45,7 +45,22 @@ scheduler = BackgroundScheduler(timezone=timezone(default_timezone))
 scheduler.start()
 
 # Audio Settings
-mixer.init()
+try:
+    mixer.init()
+except Exception as e:
+    if "ALSA" in str(e) and os.name == 'posix':
+        logger.warning("ALSA failure detected. Attempting to auto-fix /home/admin/.asoundrc...")
+        try:
+            with open('/home/admin/.asoundrc', 'w') as f:
+                f.write("pcm.!default {\n    type hw\n    card 2\n}\n\nctl.!default {\n    type hw\n    card 2\n}\n")
+            logger.info("Created /home/admin/.asoundrc with card 2 config. Retrying mixer initialization...")
+            mixer.init()
+            logger.info("Mixer initialized successfully after auto-fix.")
+        except Exception as fix_err:
+            logger.critical(f"Failed to auto-fix ALSA config: {fix_err}")
+            raise e
+    else:
+        raise e
 playlist = []
 stop_playback = False
 is_exiting = False

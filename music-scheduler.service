@@ -1,13 +1,13 @@
 [Unit]
 Description=Python Audio Player Service
-After=network.target
+After=multi-user.target
 
 [Service]
 ExecStart=/usr/bin/python3 /opt/music-scheduler/music-scheduler.py
 WorkingDirectory=/opt/music-scheduler/
 Restart=on-failure
 RestartSec=5s
-User=root
+User=admin
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=music-scheduler
