@@ -53,9 +53,8 @@ except Exception as e:
         try:
             with open('/home/admin/.asoundrc', 'w') as f:
                 f.write("pcm.!default {\n    type hw\n    card 2\n}\n\nctl.!default {\n    type hw\n    card 2\n}\n")
-            logger.info("Created /home/admin/.asoundrc with card 2 config. Retrying mixer initialization...")
-            mixer.init()
-            logger.info("Mixer initialized successfully after auto-fix.")
+            logger.info("Created /home/admin/.asoundrc. Exiting to allow systemd to restart with new configuration...")
+            sys.exit(1) # Exit with error to trigger systemd restart
         except Exception as fix_err:
             logger.critical(f"Failed to auto-fix ALSA config: {fix_err}")
             raise e
@@ -136,18 +135,18 @@ def load_schedule():
         if cron:
             logger.info(f'Configure via cron {cron} action {action}')
             if action == 'play' and file:
-                scheduler.add_job(play_playlist, 'cron', **cron, args=[file])
+                scheduler.add_job(play_playlist, 'cron', **cron, args=[file], misfire_grace_time=360)
             elif action == 'stop':
-                scheduler.add_job(stop_playlist, 'cron', **cron)
+                scheduler.add_job(stop_playlist, 'cron', **cron, misfire_grace_time=360)
             else:
                 logger.info(f'Invalid cron task configuration: {task}')
         elif date:
             logger.info(f'Configure via date {date} action {action}')
             date_time = datetime(**date)
             if action == 'play' and file:
-                scheduler.add_job(play_playlist, 'date',  args=[file], run_date=date_time) #timezone datetime(2024,6,19,1,5)
+                scheduler.add_job(play_playlist, 'date',  args=[file], run_date=date_time, misfire_grace_time=360) #timezone datetime(2024,6,19,1,5)
             elif action == 'stop':
-                scheduler.add_job(stop_playlist, 'date', run_date=date_time) #timezone datetime(2024,6,19,1,5)
+                scheduler.add_job(stop_playlist, 'date', run_date=date_time, misfire_grace_time=360) #timezone datetime(2024,6,19,1,5)
             else:
                 logger.info(f'Invalid date task configuration: {task}')
         else:
