@@ -11,7 +11,7 @@ sudo apt-get install ffmpeg
 1) Rode então o pip install:
 
 ```bash
-    pip install --no-cache-dir -r requirements.txt --break-system-packages
+sudo pip install --no-cache-dir -r requirements.txt --break-system-packages
 ```
 
 2) Rode seu music-scheduler.py (tenha atenção as configurações de cron ou date informada no schedule e a música na pasta /musics)
