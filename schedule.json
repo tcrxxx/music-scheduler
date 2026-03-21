@@ -4,16 +4,16 @@
         "file": "c:/Users/Administrador/developer/repos/music-scheduler/musics/",
         "cron": {
             "day_of_week": "sat",
-            "hour": 14,
-            "minute": 47
+            "hour": 15,
+            "minute": 4
         }
     },
     {
         "action": "stop",
         "cron": {
             "day_of_week": "sat",
-            "hour": 14,
-            "minute": 59
+            "hour": 15,
+            "minute": 10
         }
     },
     {

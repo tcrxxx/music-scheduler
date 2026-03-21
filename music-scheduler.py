@@ -5,6 +5,8 @@ from datetime import datetime
 import time
 from pygame import mixer
 import pytz
+import signal
+import sys
 from pytz import timezone
 import os
 from tzlocal import get_localzone
@@ -46,6 +48,19 @@ scheduler.start()
 mixer.init()
 playlist = []
 stop_playback = False
+is_exiting = False
+
+def signal_handler(sig, frame):
+    global stop_playback, is_exiting
+    logger.info(f"Received signal {sig}. Exiting gracefully...")
+    stop_playback = True
+    is_exiting = True
+    mixer.music.stop()
+    # Note: the scheduler shutdown will be handled in the main try-except block
+
+# Register signals
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 
 
@@ -131,7 +146,12 @@ if __name__ == '__main__':
 
     try:
         # Keep the script running
-        while True:
-            time.sleep(1)
+        while not is_exiting:
+            time.sleep(0.5)
     except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+        logger.info("Exit requested.")
+    finally:
+        logger.info("Shutting down scheduler...")
+        scheduler.shutdown(wait=False)
+        mixer.quit()
+        logger.info("Application stopped.")
