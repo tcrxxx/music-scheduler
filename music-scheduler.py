@@ -146,6 +146,6 @@ if __name__ == '__main__':
     try:
         # Keep the script running
         while True:
-            pass
+            time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()

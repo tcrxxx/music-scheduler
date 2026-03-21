@@ -33,8 +33,8 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
 
    ```bash
    sudo systemctl daemon-reload
-   sudo systemctl enable player_service.service
-   sudo systemctl start player_service.service
+   sudo systemctl enable music-scheduler.service
+   sudo systemctl start music-scheduler.service
    ```
 
 4. **Verifique o Status do Serviço:**
@@ -42,7 +42,7 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
    Para garantir que o serviço está rodando corretamente, você pode verificar o status:
 
    ```bash
-   sudo systemctl status player_service.service
+   sudo systemctl status music-scheduler.service
    ```
 
    Isso deve mostrar a saída indicando que o serviço está ativo e rodando.
@@ -52,20 +52,20 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
    Se houver problemas, você pode verificar os logs do serviço usando o `journalctl`:
 
    ```bash
-   sudo journalctl -u player_service.service -f
+   sudo journalctl -u music-scheduler.service -f
    ```
 
 ## Container Run
 
 ```bash
 # Construir a imagem Docker
-docker build -t spotify-controller .
+docker build -t music-scheduler .
 
 # Rodar o contêiner Docker
-docker run -p 5000:5000 -d spotify-controller
+docker run -d music-scheduler
 ```
 
-## Sample scheduler.json
+## Sample schedule.json
 
 ```json
  [
