@@ -29,6 +29,13 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
    
    **Nota:** Substitua `/caminho/para/o/` pelo caminho real onde seu script Python está localizado. Certifique-se de que o caminho para o interpretador Python (`/usr/bin/python3`) está correto. Além disso, substitua `seu_usuario` e `seu_grupo` pelo usuário e grupo apropriados.
 
+2. **Dê permissão de execução ao script:**
+   Certifique-se de que o script Python tenha permissão de execução.
+
+   ```bash
+   chmod +x music-scheduler.py
+   ```
+
 3. **Recarregue o `systemd` e Habilite o Serviço:**
 
    Abra um terminal e execute os seguintes comandos:
@@ -57,17 +64,11 @@ Para instalar e executar um script Python como um serviço no Linux, você pode 
    sudo journalctl -u music-scheduler.service -f
    ```
 
-## Container Run
-
-```bash
-# Construir a imagem Docker
-docker build -t music-scheduler .
-
-# Rodar o contêiner Docker
-docker run -d music-scheduler
-```
-
 ## Sample schedule.json
+
+- file property is a directory path. samples: "/opt/music-scheduler/musics/" or "c:/Users/Administrador/developer/repos/music-scheduler/musics/"
+- cron property is a cron expression. samples: {"day_of_week": "fri", "hour": 0, "minute": 54}
+- date property is a date expression. samples: {"year": 2024, "month": 6, "day": 21, "hour": 0, "minute": 48}
 
 ```json
  [
