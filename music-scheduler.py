@@ -46,7 +46,8 @@ scheduler.start()
 
 # Audio Settings
 try:
-    mixer.init()
+    # frequency=44100, size=-16, channels=2, buffer=4096
+    mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
 except Exception as e:
     if "ALSA" in str(e) and os.name == 'posix':
         logger.warning("ALSA failure detected. Attempting to auto-fix /home/admin/.asoundrc...")
