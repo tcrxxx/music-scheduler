@@ -14,25 +14,19 @@ import os
 from tzlocal import get_localzone
 import random
 import logging
-import logging.handlers
 
 # Logger settings
 logger = logging.getLogger('music-scheduler')
 logger.setLevel(logging.DEBUG)
+logger.propagate = False # Avoid duplicate logs
 log_formatter = logging.Formatter('%(name)s: %(levelname)s %(message)s')
-# SysLog (Unix only)
-if os.name == 'posix':
-    try:
-        syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-        syslog_handler.setFormatter(log_formatter)
-        logger.addHandler(syslog_handler)
-    except Exception:
-        pass
+
 # FileLog
 log_file = 'music-scheduler.log'
 file_handler = logging.FileHandler(log_file)
 file_handler.setFormatter(log_formatter)
 logger.addHandler(file_handler)
+
 # ConsoleLog
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_formatter)
