@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 import json
 from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime
+from datetime import datetime, timedelta
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 import time
 from pygame import mixer
 import pytz
@@ -144,6 +146,7 @@ def load_schedule():
         elif date:
             logger.info(f'Configure via date {date} action {action}')
             date_time = datetime(**date)
+            # Ensure date_time has timezone info if needed, but here we use the scheduler's default
             if action == 'play' and file:
                 scheduler.add_job(play_playlist, 'date',  args=[file], run_date=date_time, misfire_grace_time=360) #timezone datetime(2024,6,19,1,5)
             elif action == 'stop':
@@ -152,6 +155,69 @@ def load_schedule():
                 logger.info(f'Invalid date task configuration: {task}')
         else:
             logger.info(f'Invalid task configuration: {task}')
+    
+    check_startup_playback(tasks)
+
+def get_last_fire_time(trigger, now):
+    if isinstance(trigger, CronTrigger):
+        # To find the last fire time, we start from a week ago and find the latest one before 'now'
+        last_fire = None
+        current_check = now - timedelta(days=8) # 8 days to be safe for weekly cycles
+        while True:
+            next_fire = trigger.get_next_fire_time(last_fire, current_check if last_fire is None else last_fire)
+            if next_fire is None or next_fire > now:
+                break
+            last_fire = next_fire
+        return last_fire
+    elif isinstance(trigger, DateTrigger):
+        if trigger.run_date <= now:
+            return trigger.run_date
+    return None
+
+def check_startup_playback(tasks):
+    logger.info("Checking if playback should start immediately...")
+    now = datetime.now(timezone(default_timezone))
+    
+    last_play_time = None
+    last_play_file = None
+    last_stop_time = None
+    
+    for task in tasks:
+        action = task['action']
+        cron = task.get('cron')
+        date = task.get('date')
+        file = task.get('file')
+        
+        trigger = None
+        if cron:
+            trigger = CronTrigger(timezone=timezone(default_timezone), **cron)
+        elif date:
+            trigger = DateTrigger(run_date=datetime(**date), timezone=timezone(default_timezone))
+            
+        if trigger:
+            fire_time = get_last_fire_time(trigger, now)
+            if fire_time:
+                if action == 'play':
+                    if last_play_time is None or fire_time > last_play_time:
+                        last_play_time = fire_time
+                        last_play_file = file
+                elif action == 'stop':
+                    if last_stop_time is None or fire_time > last_stop_time:
+                        last_stop_time = fire_time
+    
+    if last_play_time:
+        if last_stop_time is None or last_play_time > last_stop_time:
+            logger.info(f"Startup check: Last 'play' ({last_play_time}) is more recent than last 'stop' ({last_stop_time}). Starting playback.")
+            # Start play_playlist in a background thread or just call it if we are already in the main loop?
+            # Actually, play_playlist is a blocking loop. We should run it like the scheduler would.
+            # However, the scheduler is ALREADY running. We can just trigger the job now.
+            if last_play_file:
+                # We add a one-off job to start now
+                scheduler.add_job(play_playlist, 'date', args=[last_play_file], run_date=now)
+        else:
+            logger.info(f"Startup check: Last 'stop' ({last_stop_time}) is more recent than last 'play' ({last_play_time}). Waiting for next scheduled event.")
+    else:
+        logger.info("Startup check: No previous play events found.")
 
 if __name__ == '__main__':
     load_schedule()
