@@ -3,17 +3,34 @@
         "action": "play",
         "file": "c:/Users/Administrador/developer/repos/music-scheduler/musics/",
         "cron": {
-            "day_of_week": "sat",
-            "hour": 15,
-            "minute": 4
+            "day_of_week": "mon",
+            "hour": 23,
+            "minute": 1
         }
     },
     {
         "action": "stop",
         "cron": {
-            "day_of_week": "sat",
-            "hour": 15,
-            "minute": 10
+            "day_of_week": "mon",
+            "hour": 23,
+            "minute": 4
+        }
+    },
+    {
+        "action": "play",
+        "file": "c:/Users/Administrador/developer/repos/music-scheduler/musics/",
+        "cron": {
+            "day_of_week": "mon",
+            "hour": 23,
+            "minute": 6
+        }
+    },
+    {
+        "action": "stop",
+        "cron": {
+            "day_of_week": "mon",
+            "hour": 23,
+            "minute": 9
         }
     },
     {
