@@ -5,7 +5,7 @@
         "cron": {
             "day_of_week": "mon",
             "hour": 8,
-            "minute": 30
+            "minute": 0
         }
     },
     {
@@ -38,7 +38,7 @@
         "file": "/opt/music-scheduler/musics/",
         "cron": {
             "day_of_week": "fri",
-            "hour": 9,
+            "hour": 13,
             "minute": 0
         }
     },
@@ -46,7 +46,7 @@
         "action": "stop",
         "cron": {
             "day_of_week": "fri",
-            "hour": 16,
+            "hour": 17,
             "minute": 30
         }
     },
