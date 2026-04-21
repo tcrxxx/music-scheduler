@@ -60,6 +60,7 @@ except Exception as e:
 playlist = []
 stop_playback = False
 is_exiting = False
+tasks = [] # Global task storage
 
 def signal_handler(sig, frame):
     global stop_playback, is_exiting
@@ -76,7 +77,15 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 
 def play_playlist(directory):
-    global playlist
+    global playlist, stop_playback
+    
+    # Check if we should actually be playing
+    scheduled_action = get_current_scheduled_action()
+    if scheduled_action['action'] != 'play' or scheduled_action['file'] != directory:
+        logger.info(f"Skipping play for {directory}: Most recent scheduled action is {scheduled_action['action']} (file: {scheduled_action.get('file')})")
+        return
+
+    stop_playback = False
     load_playlist(directory)
     while not stop_playback:
         if playlist:
@@ -120,6 +129,7 @@ def stop_playlist():
     logger.info('Music stopped!')
 
 def load_schedule():
+    global tasks
     with open('schedule.json') as f:
         tasks = json.load(f)
     
@@ -150,7 +160,7 @@ def load_schedule():
         else:
             logger.info(f'Invalid task configuration: {task}')
     
-    check_startup_playback(tasks)
+    check_startup_playback()
 
 def get_last_fire_time(trigger, now):
     if isinstance(trigger, CronTrigger):
@@ -168,13 +178,14 @@ def get_last_fire_time(trigger, now):
             return trigger.run_date
     return None
 
-def check_startup_playback(tasks):
-    logger.info("Checking if playback should start immediately...")
+def get_current_scheduled_action():
+    """
+    Analyzes tasks and returns the most recent scheduled action (play or stop)
+    based on the current time.
+    """
     now = datetime.now(timezone(default_timezone))
     
-    last_play_time = None
-    last_play_file = None
-    last_stop_time = None
+    last_action = {'action': None, 'time': None, 'file': None}
     
     for task in tasks:
         action = task['action']
@@ -191,27 +202,24 @@ def check_startup_playback(tasks):
         if trigger:
             fire_time = get_last_fire_time(trigger, now)
             if fire_time:
-                if action == 'play':
-                    if last_play_time is None or fire_time > last_play_time:
-                        last_play_time = fire_time
-                        last_play_file = file
-                elif action == 'stop':
-                    if last_stop_time is None or fire_time > last_stop_time:
-                        last_stop_time = fire_time
+                if last_action['time'] is None or fire_time > last_action['time']:
+                    last_action = {'action': action, 'time': fire_time, 'file': file}
     
-    if last_play_time:
-        if last_stop_time is None or last_play_time > last_stop_time:
-            logger.info(f"Startup check: Last 'play' ({last_play_time}) is more recent than last 'stop' ({last_stop_time}). Starting playback.")
-            # Start play_playlist in a background thread or just call it if we are already in the main loop?
-            # Actually, play_playlist is a blocking loop. We should run it like the scheduler would.
-            # However, the scheduler is ALREADY running. We can just trigger the job now.
-            if last_play_file:
-                # We add a one-off job to start now
-                scheduler.add_job(play_playlist, 'date', args=[last_play_file], run_date=now)
-        else:
-            logger.info(f"Startup check: Last 'stop' ({last_stop_time}) is more recent than last 'play' ({last_play_time}). Waiting for next scheduled event.")
+    return last_action
+
+def check_startup_playback():
+    logger.info("Checking if playback should start immediately...")
+    scheduled_action = get_current_scheduled_action()
+    
+    if scheduled_action['action'] == 'play':
+        logger.info(f"Startup check: Last scheduled action is 'play' ({scheduled_action['time']}). Starting playback.")
+        if scheduled_action['file']:
+            # We add a one-off job to start now
+            scheduler.add_job(play_playlist, 'date', args=[scheduled_action['file']], run_date=datetime.now(timezone(default_timezone)))
+    elif scheduled_action['action'] == 'stop':
+        logger.info(f"Startup check: Last scheduled action is 'stop' ({scheduled_action['time']}). Waiting for next scheduled event.")
     else:
-        logger.info("Startup check: No previous play events found.")
+        logger.info("Startup check: No previous events found.")
 
 if __name__ == '__main__':
     load_schedule()
