@@ -3,7 +3,7 @@
         "action": "play",
         "file": "/opt/music-scheduler/musics/",
         "cron": {
-            "day_of_week": "mon",
+            "day_of_week": "tue",
             "hour": 8,
             "minute": 0
         }
@@ -11,8 +11,8 @@
     {
         "action": "stop",
         "cron": {
-            "day_of_week": "mon",
-            "hour": 13,
+            "day_of_week": "tue",
+            "hour": 12,
             "minute": 0
         }
     },
@@ -29,25 +29,25 @@
         "action": "stop",
         "cron": {
             "day_of_week": "wed",
-            "hour": 18,
-            "minute": 30
+            "hour": 19,
+            "minute": 0
         }
     },
     {
         "action": "play",
         "file": "/opt/music-scheduler/musics/",
         "cron": {
-            "day_of_week": "fri",
-            "hour": 13,
+            "day_of_week": "thu",
+            "hour": 14,
             "minute": 0
         }
     },
     {
         "action": "stop",
         "cron": {
-            "day_of_week": "fri",
-            "hour": 17,
-            "minute": 30
+            "day_of_week": "thu",
+            "hour": 19,
+            "minute": 0
         }
     },
     {
